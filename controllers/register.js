@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const handleRegister = (req, res, db, bcrypt) => {
+const handleRegister = (req, res, db, bcrypt, authLimiter) => {
     const {name, email, password } = req.body;
     
         if (!name || !email || !password) {
@@ -33,6 +33,7 @@ const handleRegister = (req, res, db, bcrypt) => {
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: ONE_WEEK_MS,
             });
+            authLimiter.resetKey(req.ip);
             res.json(user);
         })
         .catch(error => {

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const handleSignIn = (req, res, db, bcrypt) => {
+const handleSignIn = (req, res, db, bcrypt, authLimiter) => {
     const { email, password } = req.body;
     
         if(!email || !password) {
@@ -31,6 +31,7 @@ const handleSignIn = (req, res, db, bcrypt) => {
                         maxAge: ONE_WEEK_MS,
                     });
 
+                    authLimiter.resetKey(req.ip);
                     res.json(user);
                 } else {
                     res.status(400).json('wrong credentials');

@@ -49,10 +49,10 @@ app.get('/', (req, res) => {
 })
 
 //signin (rate limited to prevent brute force)
-app.post('/signin', authLimiter, (req, res) => {signin.handleSignIn(req, res, db, bcrypt)});
+app.post('/signin', authLimiter, (req, res) => {signin.handleSignIn(req, res, db, bcrypt, authLimiter)});
 
 //register (rate limited to prevent brute force)
-app.post('/register', authLimiter, (req, res) => {register.handleRegister(req, res, db, bcrypt)});
+app.post('/register', authLimiter, (req, res) => {register.handleRegister(req, res, db, bcrypt, authLimiter)});
 
 //logout
 app.post('/logout', (req, res) => {
