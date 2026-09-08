@@ -39,8 +39,10 @@ const authLimiter = rateLimit({
 
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = ['http://localhost:5173', 'https://smart-brain-beryl.vercel.app'];
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
 }));
 
@@ -70,6 +72,7 @@ app.put('/image', requireAuth, (req, res) => {image.handleImage(req, res, db)});
 //detect objects in image
 app.post('/detect', requireAuth, (req, res) => {detect.handleDetect(req, res, db)});
 
-app.listen(3000, () => {
-    console.log('App is running on port 3000.')
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`App is running on port ${PORT}.`)
 });
