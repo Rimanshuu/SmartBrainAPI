@@ -33,8 +33,10 @@ const app = express();
 // rate limit auth endpoints to prevent brute force
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // max 5 requests per window
-    message: 'too many login attempts, please try again later',
+    max: 5, // max 5 failed attempts per window
+    skipSuccessfulRequests: true, // only failed logins count, so normal use never locks you out
+    // sent as JSON like every other error, so the frontend can show it
+    message: { error: 'too many failed attempts, please try again in 15 minutes' },
     standardHeaders: true,
     legacyHeaders: false,
 });
