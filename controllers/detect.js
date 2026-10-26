@@ -2,6 +2,23 @@ const CONFIDENCE_THRESHOLD = 0.85;
 const PERSON_LABEL = 'person';
 const HF_API_URL = 'https://router.huggingface.co/hf-inference/models/facebook/detr-resnet-50';
 
+// turn HF status codes into messages the user can act on
+const getHfErrorMessage = (status, hfMessage) => {
+    switch (status) {
+        case 402:
+            return 'detection service is out of credits, please try again later';
+        case 401:
+        case 403:
+            return 'detection service rejected the API token';
+        case 429:
+            return 'too many detection requests, please wait a moment';
+        case 503:
+            return 'detection model is loading, please try again in a few seconds';
+        default:
+            return hfMessage || 'error detecting objects from image';
+    }
+};
+
 // moved from frontend so we can:
 // 1. keep HF token safe (only in backend env, not exposed in bundle)
 // 2. avoid CORS issues (backend can fetch any image without browser restrictions)
@@ -33,7 +50,10 @@ const handleDetect = async (req, res, db) => {
         });
 
         if (!hfResponse.ok) {
-            return res.status(400).json('error detecting objects from image');
+            // HF sends the reason as { error: '...' } in the body, log it so it shows in server logs
+            const hfError = await hfResponse.json().catch(() => ({}));
+            console.log(`HF error ${hfResponse.status}:`, hfError.error || hfError);
+            return res.status(502).json(getHfErrorMessage(hfResponse.status, hfError.error));
         }
 
         const results = await hfResponse.json();
