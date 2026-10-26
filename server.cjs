@@ -12,6 +12,7 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 const detect = require('./controllers/detect');
+const reset = require('./controllers/reset');
 const requireAuth = require('./middleware/requireAuth');
 const { cookieOptions } = require('./middleware/cookieOptions');
 
@@ -70,6 +71,9 @@ app.get('/profile', requireAuth, (req, res) => {profile.handleProfile(req, res, 
 
 //image count
 app.put('/image', requireAuth, (req, res) => {image.handleImage(req, res, db)});
+
+//reset image count back to 0
+app.put('/image/reset', requireAuth, (req, res) => {reset.handleReset(req, res, db)});
 
 //detect objects in image
 app.post('/detect', requireAuth, (req, res) => {detect.handleDetect(req, res, db)});
