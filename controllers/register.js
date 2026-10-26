@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-
-const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const { cookieOptions, ONE_WEEK_MS } = require('../middleware/cookieOptions');
 
 const handleRegister = (req, res, db, bcrypt, authLimiter) => {
     const {name, email, password } = req.body;
@@ -28,9 +27,7 @@ const handleRegister = (req, res, db, bcrypt, authLimiter) => {
         .then(user => {
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
             res.cookie('token', token, {
-                httpOnly: true,
-                sameSite: 'lax',
-                secure: process.env.NODE_ENV === 'production',
+                ...cookieOptions,
                 maxAge: ONE_WEEK_MS,
             });
             authLimiter.resetKey(req.ip);

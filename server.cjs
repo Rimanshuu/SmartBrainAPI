@@ -13,6 +13,7 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 const detect = require('./controllers/detect');
 const requireAuth = require('./middleware/requireAuth');
+const { cookieOptions } = require('./middleware/cookieOptions');
 
 const db = knex ({
   client: 'pg',
@@ -58,7 +59,8 @@ app.post('/register', authLimiter, (req, res) => {register.handleRegister(req, r
 
 //logout
 app.post('/logout', (req, res) => {
-    res.clearCookie('token');
+    // must match the options the cookie was set with, or the browser won't clear it
+    res.clearCookie('token', cookieOptions);
     res.json('logged out');
 });
 
